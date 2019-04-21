@@ -11,7 +11,7 @@ module Specify(T)
 
     def to_sql : String
       String.build do |str|
-        str << "SELECT " << select_part << " FROM " << "#{T.table} #{Specify.sp_alias} " << joins.join(' ') << ' ' << "WHERE " << where_part << ';'
+        str << "SELECT " << select_part << " FROM " << "#{T.table} #{Specify.sp_alias}" << (joins.size.zero? ? "" : ' ') << joins.join(' ') << ' ' << "WHERE " << where_part << ';'
       end
     end
   end

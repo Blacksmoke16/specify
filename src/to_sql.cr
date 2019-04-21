@@ -1,7 +1,9 @@
 class String
   def to_sql
     String.build do |str|
+      str << '"'
       str << self
+      str << '"'
     end
   end
 end

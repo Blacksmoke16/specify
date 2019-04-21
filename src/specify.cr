@@ -18,6 +18,10 @@ module Specify(T)
     LogicOperator(T | BaseSpec).new Operator::And, modifiers.map(&.as(T | BaseSpec)).to_a
   end
 
+  def self.or(*modifiers : T | BaseSpec)
+    LogicOperator(T | BaseSpec).new Operator::Or, modifiers.map(&.as(T | BaseSpec)).to_a
+  end
+
   def self.join(new_alias : String, on : On)
     Join(T).new new_alias, on
   end
@@ -26,9 +30,13 @@ module Specify(T)
     On.new left, right
   end
 
+  def self.select(columns : Array(String), distinct : Bool = false) : Select
+    Select.new columns, distinct
+  end
+
   # Returns an `Array(self)` with records matching the provided *spec*.
   def match(*modifiers : T | BaseSpec)
-    prepare *modifiers
+    prepare Specify(T).and(*modifiers)
   end
 
   # Returns an `Array(self)` with records matching the provided *spec*.
@@ -37,60 +45,8 @@ module Specify(T)
   end
 
   # :nodoc:
-  private def prepare(spec : LogicOperator(T | BaseSpec)) : QueryBuilder
+  private def prepare(spec : LogicOperator) : QueryBuilder
     builder = QueryBuilder(self).new spec
     builder
-  end
-
-  # :nodoc:
-  private def prepare(*matchers : T | BaseSpec)
-    prepare Specify(T).and(*matchers)
-  end
-end
-
-struct HasName < Specify::QuerySpec
-  def initialize(@name : String); end
-
-  def get_spec : Specify::BaseSpec
-    Specify.and(
-      Specify(String).eq("name", @name)
-    )
-  end
-end
-
-struct IsActive < Specify::QuerySpec
-  def get_spec : Specify::BaseSpec
-    Specify.and(
-      Specify(Bool).eq("is_active", true)
-    )
-  end
-end
-
-class Contact
-  def self.table
-    "contacts"
-  end
-
-  extend Specify(HasName)
-end
-
-require "sqlite3"
-
-query = Contact.match(
-  Specify(Int32).gte("age", 30),
-  HasName.new("Foo"),
-  IsActive.new
-)
-
-puts query.to_sql, query.params
-
-DB.open "sqlite3://./data.db" do |db|
-  # puts "contacts:"
-  db.query query.to_sql, query.params do |rs|
-    puts "#{rs.column_name(0)} (#{rs.column_name(1)})"
-    # => name (age)
-    rs.each do
-      puts "#{rs.read(String)} #{rs.read(Int32)}"
-    end
   end
 end

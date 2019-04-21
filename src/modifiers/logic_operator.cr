@@ -19,11 +19,11 @@ module Specify(T)
         str << '(' if @members.size > 1
         @members.map do |m|
           case m
-          # when Specify::Modifier  then m.modify builder
+          when Specify::Modifier  then m.modify builder
           when Specify::Filter    then m.get_filter builder
           when Specify::QuerySpec then m.get_spec.get_filter builder
           end
-        end.compact.join " #{@operator.to_sql} ", str
+        end.join " #{@operator.to_sql} ", str
         str << ')' if @members.size > 1
       end
     end
