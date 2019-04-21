@@ -1,0 +1,24 @@
+name: specify
+
+description: |
+  Specification pattern based SQL query builder.  Brings type saftey, resusability, and testability to SQL queries.
+
+version: 0.1.0
+
+authors:
+  - Blacksmoke16 <Blacksmoke16@eve.tools>
+
+crystal: 0.28.0
+
+license: MIT
+
+dependencies:
+  db:
+    github: crystal-lang/crystal-db
+  sqlite3:
+    github: crystal-lang/crystal-sqlite3
+
+development_dependencies:
+  ameba:
+    github: veelenga/ameba
+    version: ~> 0.9.0
