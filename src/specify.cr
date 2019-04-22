@@ -6,7 +6,8 @@ require "./query_builder"
 
 # TODO: Write documentation for `Specify`
 module Specify(T)
-  class_property sp_alias : Char = 's'
+  # Default alias when none is provided.
+  class_getter sp_alias : Char = 's'
 
   {% for name, operator in Comparison::OPERATORS %}
     def self.{{name.downcase.id}}(field : String, value : T, falias : String? = nil) : Comparison

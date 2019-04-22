@@ -6,7 +6,9 @@ def assert_filter(statement : String, params : Array(Array(DB::Any) | DB::Any), 
   qb = Specify::QueryBuilder(T).new yield nil
   sql = qb.to_sql.split("WHERE")
   sql.first.strip.should eq select_part
-  sql[1].strip.should eq statement
+  if where = sql[1]?
+    where.strip.should eq statement
+  end
   qb.params.should eq params
 end
 
@@ -28,12 +30,28 @@ struct IsActive < Specify::QuerySpec
   end
 end
 
+class User
+  def self.table
+    "users"
+  end
+
+  extend Specify(Specify::QuerySpec)
+end
+
+class Post
+  def self.table
+    "posts"
+  end
+
+  extend Specify(Specify::QuerySpec)
+end
+
 class Setting
   def self.table
     "settings"
   end
 
-  extend Specify(HasName)
+  extend Specify(Specify::QuerySpec)
 end
 
 class Contact
@@ -41,5 +59,5 @@ class Contact
     "contacts"
   end
 
-  extend Specify(HasName)
+  extend Specify(Specify::QuerySpec)
 end

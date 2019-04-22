@@ -13,9 +13,9 @@ describe Specify do
 
       describe "with two filter filters" do
         it "should generate correctly" do
-          assert_filter("(s.age >= ? AND s.name LIKE ?);", [30, "\"Jim\""]) do
+          assert_filter("(g.age >= ? AND s.name LIKE ?);", [30, "\"Jim\""]) do
             Specify.and(
-              Specify(Int32).gte("age", 30),
+              Specify(Int32).gte("age", 30, "g"),
               Specify(String).like("name", "Jim")
             )
           end
@@ -39,6 +39,21 @@ describe Specify do
               Specify(Int32).lte("age", 30),
               Specify(String).not_like("name", "Jim")
             )
+          end
+        end
+      end
+    end
+
+    describe "#add" do
+      describe "it can add another filter into an existing logic operator" do
+        it "should be included in the where clause" do
+          assert_filter("(s.age < ? AND foo.id NOT IN ?);", [2, "(1,2,3)"]) do
+            spec = Specify.and(
+              Specify(Int32).lt("age", 2)
+            )
+            spec.add Specify(Array(Int32)).not_in("id", [1, 2, 3], "foo")
+
+            spec
           end
         end
       end
